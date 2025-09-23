@@ -1,0 +1,98 @@
+1️. Insert Data into All Tables
+-- Customer table
+INSERT INTO Customer (customer_id, name, email, phone, address)
+VALUES 
+(1, 'Amit Sharma', 'amit.sharma@example.com', '9876543210', 'Delhi, India'),
+(2, 'Priya Kumar', 'priya.kumar@example.com', NULL, 'Mumbai, India'), -- phone missing → NULL
+(3, 'Rahul Verma', 'rahul.verma@example.com', '9123456780', NULL);    -- address missing → NULL
+
+-- Category table
+INSERT INTO Category (category_id, category_name)
+VALUES 
+(1, 'Electronics'),
+(2, 'Clothing'),
+(3, 'Books');
+
+-- Product table
+INSERT INTO Product (product_id, product_name, price, stock, category_id)
+VALUES
+(1, 'Smartphone', 15000.00, 50, 1),
+(2, 'Laptop', 55000.00, 20, 1),
+(3, 'T-Shirt', 500.00, 100, 2),
+(4, 'Novel', 300.00, 200, 3);
+
+-- Order table
+INSERT INTO `Order` (order_id, customer_id, order_date, total_amount)
+VALUES
+(1, 1, '2025-09-20', 15500.00),
+(2, 2, '2025-09-21', NULL), -- total_amount missing → NULL
+(3, 3, '2025-09-22', 800.00);
+
+-- OrderItem table
+INSERT INTO OrderItem (order_item_id, order_id, product_id, quantity, price)
+VALUES
+(1, 1, 1, 1, 15000.00),
+(2, 1, 4, 1, 500.00),
+(3, 2, 3, 2, 1000.00),
+(4, 3, 3, 1, 500.00),
+(5, 3, 4, 1, 300.00);
+
+
+
+2️. Handle Missing Values
+We’ve already used:
+- NULL for optional fields like phone, address, and total_amount.
+- Defaults could be added to schema if needed (e.g., default stock or category).
+Example of setting defaults:
+ALTER TABLE Product ALTER COLUMN stock SET DEFAULT 0;
+ALTER TABLE `Order` ALTER COLUMN total_amount SET DEFAULT 0.00;
+
+
+
+3️. Update Data (Clean & Consistent)
+-- Fill missing phone number for Priya Kumar
+UPDATE Customer
+SET phone = '9988776655'
+WHERE customer_id = 2 AND phone IS NULL;
+
+-- Fill missing address for Rahul Verma
+UPDATE Customer
+SET address = 'Bengaluru, India'
+WHERE customer_id = 3 AND address IS NULL;
+
+-- Calculate and update missing total_amount for order_id = 2
+UPDATE `Order`
+SET total_amount = (
+    SELECT SUM(price) 
+    FROM OrderItem 
+    WHERE order_id = 2
+)
+WHERE order_id = 2 AND total_amount IS NULL;
+
+
+
+4️. Delete Unwanted Records
+-- Delete customers with no orders
+DELETE FROM Customer
+WHERE customer_id NOT IN (SELECT DISTINCT customer_id FROM `Order`);
+
+-- Delete products with zero stock
+DELETE FROM Product
+WHERE stock = 0;
+
+
+
+5️. Final Check
+SELECT * FROM Customer;
+SELECT * FROM Category;
+SELECT * FROM Product;
+SELECT * FROM `Order`;
+SELECT * FROM OrderItem;
+
+
+
+✅ Outcome:
+- All tables are populated with valid data respecting Primary Key and Foreign Key constraints.
+- Missing values are handled with NULL or sensible defaults.
+- Updates ensure no incomplete records remain.
+- Deletes remove irrelevant or unused data, keeping the database clean.
