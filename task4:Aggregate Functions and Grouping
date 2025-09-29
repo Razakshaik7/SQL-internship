@@ -1,0 +1,57 @@
+***Example Tables***
+Imagine we have a table called orders:
+
+order_id	     customer_id	   product    	amount    	region    	order_date
+101	           1	             Laptop	      75000	      South	      2025-09-01
+102	           2	             Phone	      25000	      North	      2025-09-05
+103	           1	             Headphones	  5000	      South	      2025-09-10
+104	           3	             Tablet	      30000	      West	      2025-09-12
+105	           2	             Laptop	      80000	      North	      2025-09-15
+
+***SQL Queries with Aggregates***
+1. Total sales (SUM)
+sql
+SELECT SUM(amount) AS total_sales
+FROM orders;
+2. Count number of orders
+sql
+SELECT COUNT(*) AS total_orders
+FROM orders;
+3. Average order value
+sql
+SELECT AVG(amount) AS avg_order_value
+FROM orders;
+4. Group by region (categorize + aggregate)
+sql
+SELECT region, SUM(amount) AS total_sales, COUNT(*) AS num_orders
+FROM orders
+GROUP BY region;
+5. Group by product with average sales
+sql
+SELECT product, AVG(amount) AS avg_sales
+FROM orders
+GROUP BY product;
+6. Filter groups using HAVING
+sql
+-- Show only regions with total sales greater than 50,000
+SELECT region, SUM(amount) AS total_sales
+FROM orders
+GROUP BY region
+HAVING SUM(amount) > 50000;
+7. Combine GROUP BY + ORDER BY
+sql
+SELECT product, SUM(amount) AS total_sales
+FROM orders
+GROUP BY product
+ORDER BY total_sales DESC;
+
+***Outcome***
+Use aggregate functions (SUM, COUNT, AVG)
+Categorize data with GROUP BY
+Filter aggregated results with HAVING
+Sort summaries with ORDER BY
+Filter aggregated results with HAVING
+
+Sort summaries with ORDER BY
+
+This gives you the ability to summarize and analyze tabular data effectively — the foundation of reporting and business intelligence.
