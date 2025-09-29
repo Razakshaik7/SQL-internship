@@ -1,0 +1,57 @@
+***Example Tables***
+***customers***
+
+customer_id	     name     	city
+1	               Alice	    Hyderabad
+2	               Bob	      Delhi
+3	               Charlie	  Mumbai
+4	               Diana	    Chennai
+
+***orders***
+
+order_id	   customer_id	   product   	   amount
+101	         1	             Laptop	       75000
+102	         2	             Phone	       25000
+103	         1	             Headphones    5000
+104	         3	             Tablet	       30000
+105	         5	             Camera	       20000	← notice: customer_id=5 doesn’t exist in customers
+
+
+***SQL Queries with Different Joins***
+1. INNER JOIN
+Returns only matching rows between both tables.
+SELECT c.customer_id, c.name, o.product, o.amount
+FROM customers c
+INNER JOIN orders o ON c.customer_id = o.customer_id;
+👉 Only customers who have placed orders will appear.
+
+2. LEFT JOIN
+Returns all rows from the left table (customers), plus matches from orders.
+SELECT c.customer_id, c.name, o.product, o.amount
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id;
+👉 All customers are listed, even if they have no orders (with NULL for missing order data).
+
+3. RIGHT JOIN
+Returns all rows from the right table (orders), plus matches from customers.
+SELECT c.customer_id, c.name, o.product, o.amount
+FROM customers c
+RIGHT JOIN orders o ON c.customer_id = o.customer_id;
+👉 All orders are listed, even if the customer doesn’t exist in the customers table (like order_id=105).
+
+4. FULL OUTER JOIN
+Returns all rows from both tables, matching where possible.
+SELECT c.customer_id, c.name, o.product, o.amount
+FROM customers c
+FULL OUTER JOIN orders o ON c.customer_id = o.customer_id;
+👉 You’ll see:
+Customers with orders
+Customers without orders
+Orders without valid customers
+
+***Outcome***
+By practicing these queries, you’ll master:
+INNER JOIN → intersection of both tables
+LEFT JOIN → all from left + matches
+RIGHT JOIN → all from right + matches
+FULL OUTER JOIN → everything from both sides
