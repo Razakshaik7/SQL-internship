@@ -1,0 +1,70 @@
+***Example Database***
+Imagine we have two tables:
+
+***customers***
+
+customer_id     	name     	city     	    age
+1	                Alice	    Hyderabad	    28
+2	                Bob	      Delhi	        35
+3	                Charlie	  Mumbai	      42
+4	                Diana	    Hyderabad	    30
+
+***orders***
+
+order_id	   customer_id	   product    	amount   	order_date
+101	         1	             Laptop	      75000	    2025-09-01
+102	         2	             Phone	      25000	    2025-09-05
+103	         1	             Headphones	  5000	    2025-09-10
+104	         3	             Tablet	      30000	    2025-09-12
+
+
+***SQL Script***
+sql
+-- 1. Select all columns from customers
+SELECT * 
+FROM customers;
+-- 2. Select specific columns
+SELECT name, city 
+FROM customers;
+-- 3. Filter with WHERE
+SELECT * 
+FROM customers
+WHERE city = 'Hyderabad';
+-- 4. Use AND / OR
+SELECT * 
+FROM customers
+WHERE city = 'Hyderabad' AND age > 25;
+SELECT * 
+FROM customers
+WHERE city = 'Delhi' OR city = 'Mumbai';
+-- 5. Pattern matching with LIKE
+SELECT * 
+FROM customers
+WHERE name LIKE 'A%';   -- names starting with A
+-- 6. Range filtering with BETWEEN
+SELECT * 
+FROM customers
+WHERE age BETWEEN 30 AND 40;
+-- 7. Sorting results with ORDER BY
+SELECT * 
+FROM orders
+ORDER BY amount DESC;
+-- 8. Limit the number of results
+SELECT * 
+FROM orders
+ORDER BY order_date DESC
+LIMIT 2;
+-- 9. Join two tables (customers + orders)
+SELECT c.name, o.product, o.amount
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.amount > 20000
+ORDER BY o.amount DESC;
+
+***Outcome***
+You now know how to retrieve data with SELECT.
+Apply filters with WHERE, AND, OR, LIKE, BETWEEN.
+Sort results with ORDER BY.
+Restrict rows with LIMIT.
+Combine data from multiple tables with JOIN.
+This script gives you a clear understanding of SQL basics and how to query relational databases effectively.
