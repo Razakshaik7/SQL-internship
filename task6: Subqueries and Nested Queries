@@ -1,0 +1,73 @@
+***Sample Tables***
+Assume the following schema:
+employees(id, name, department_id, salary)
+departments(id, name)
+projects(id, name, department_id)
+project_assignments(employee_id, project_id)
+
+1. Subquery in SELECT (Scalar Subquery)
+SELECT 
+    name,
+    salary,
+    (SELECT AVG(salary) FROM employees) AS avg_salary
+FROM employees;
+Purpose: Compare each employee’s salary to the company average.
+
+2. Subquery in WHERE (Correlated Subquery)
+SELECT name, salary
+FROM employees e
+WHERE salary > (
+    SELECT AVG(salary)
+    FROM employees
+    WHERE department_id = e.department_id
+);
+Purpose: Find employees earning above their department’s average.
+
+3. Subquery in FROM (Derived Table)
+SELECT department_id, avg_salary
+FROM (
+    SELECT department_id, AVG(salary) AS avg_salary
+    FROM employees
+    GROUP BY department_id
+) AS dept_avg
+WHERE avg_salary > 70000;
+Purpose: Filter departments with high average salaries.
+
+4. Subquery with IN
+SELECT name
+FROM employees
+WHERE department_id IN (
+    SELECT id
+    FROM departments
+    WHERE name LIKE '%Engineering%'
+);
+Purpose: List employees in engineering-related departments.
+
+5. Subquery with EXISTS (Correlated)
+SELECT name
+FROM employees e
+WHERE EXISTS (
+    SELECT 1
+    FROM project_assignments pa
+    WHERE pa.employee_id = e.id
+);
+Purpose: Find employees assigned to at least one project.
+
+6. Subquery with =
+SELECT name
+FROM departments
+WHERE id = (
+    SELECT department_id
+    FROM employees
+    GROUP BY department_id
+    ORDER BY COUNT(*) DESC
+    LIMIT 1
+);
+Purpose: Find the department with the most employees.
+
+***Outcome***
+These queries build your mastery of:
+Scalar vs. correlated subqueries
+Nesting in SELECT, FROM, and WHERE
+Logical operators: IN, EXISTS, =
+Performance-aware filtering and aggregation
