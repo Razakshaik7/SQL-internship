@@ -1,0 +1,52 @@
+1. What are Stored Procedures & Functions?
+Stored Procedure → A saved block of SQL statements that can take parameters, perform logic, and return results (or affect data).
+Function → Similar to procedures, but they must return a value and can be used inside queries.
+
+2. Stored Procedure Example
+Imagine you have an Employees table and you want a procedure that returns employees above a certain salary threshold.
+CREATE PROCEDURE GetHighEarners (@MinSalary DECIMAL(10,2))
+AS
+BEGIN
+    SET NOCOUNT ON;
+    IF @MinSalary < 0
+    BEGIN
+        PRINT 'Invalid salary value';
+        RETURN;
+    END
+    SELECT EmpID, Name, Salary
+    FROM Employees
+    WHERE Salary >= @MinSalary;
+END;
+
+Usage:
+EXEC GetHighEarners @MinSalary = 60000;
+
+3. Function Example
+Now, let’s create a function that calculates a bonus based on salary.
+CREATE FUNCTION CalculateBonus (@Salary DECIMAL(10,2))
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    DECLARE @Bonus DECIMAL(10,2);
+    IF @Salary < 50000
+        SET @Bonus = @Salary * 0.05;   -- 5% bonus
+    ELSE
+        SET @Bonus = @Salary * 0.10;   -- 10% bonus
+    RETURN @Bonus;
+END;
+
+Usage inside a query:
+SELECT Name, Salary, dbo.CalculateBonus(Salary) AS Bonus
+FROM Employees;
+
+4. Why Use Them?
+Reusability → Write once, use many times.
+Abstraction → Hide complex logic behind a simple call.
+Security → Control what logic users can run without exposing raw tables.
+Maintainability → Update logic in one place instead of rewriting queries everywhere.
+
+5. Outcome
+By practicing with both:
+You’ll know how to modularize SQL logic.
+You’ll understand the difference between procedures (actions) and functions (calculations).
+You’ll be able to build reusable, parameterized SQL blocks for real-world applications.
