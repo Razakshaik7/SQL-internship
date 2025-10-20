@@ -1,0 +1,181 @@
+***AIRPORTS***
+CREATE TABLE Airport (
+airport_code CHAR(3) PRIMARY KEY,
+name VARCHAR(100) NOT NULL,
+city VARCHAR(100) NOT NULL,
+country VARCHAR(100) NOT NULL
+);
+
+***AIRCRAFT***
+CREATE TABLE Aircraft (
+aircraft_id INT AUTO_INCREMENT PRIMARY KEY,
+model VARCHAR(100) NOT NULL,
+total_seats INT NOT NULL CHECK (total_seats > 0)
+);
+
+***FLIGHTS***
+CREATE TABLE Flight (
+flight_id INT AUTO_INCREMENT PRIMARY KEY,
+flight_number VARCHAR(10) NOT NULL,
+aircraft_id INT NOT NULL,
+departure_airport CHAR(3) NOT NULL,
+arrival_airport CHAR(3) NOT NULL,
+departure_time DATETIME NOT NULL,
+arrival_time DATETIME NOT NULL,
+base_fare DECIMAL(10,2) NOT NULL,
+status ENUM('Scheduled','Delayed','Cancelled','Completed') DEFAULT 'Scheduled',
+UNIQUE (flight_number, departure_time),
+FOREIGN KEY (aircraft_id) REFERENCES Aircraft(aircraft_id),
+FOREIGN KEY (departure_airport) REFERENCES Airport(airport_code),
+FOREIGN KEY (arrival_airport) REFERENCES Airport(airport_code),
+CHECK (arrival_time > departure_time),
+CHECK (departure_airport <> arrival_airport)
+);
+
+***SEATS***
+CREATE TABLE Seat (
+seat_id INT AUTO_INCREMENT PRIMARY KEY,
+flight_id INT NOT NULL,
+seat_number VARCHAR(5) NOT NULL,
+cabin_class ENUM('Economy','PremiumEconomy','Business','First') NOT NULL,
+is_aisle BOOLEAN DEFAULT FALSE,
+is_window BOOLEAN DEFAULT FALSE,
+is_exit_row BOOLEAN DEFAULT FALSE,
+FOREIGN KEY (flight_id) REFERENCES Flight(flight_id) ON DELETE CASCADE,
+UNIQUE (flight_id, seat_number)
+);
+
+***CUSTOMERS***
+CREATE TABLE Customer (
+customer_id INT AUTO_INCREMENT PRIMARY KEY,
+first_name VARCHAR(100) NOT NULL,
+last_name VARCHAR(100) NOT NULL,
+email VARCHAR(255) NOT NULL UNIQUE,
+phone VARCHAR(20)
+);
+
+***BOOKINS***
+CREATE TABLE Booking (
+booking_id INT AUTO_INCREMENT PRIMARY KEY,
+flight_id INT NOT NULL,
+customer_id INT NOT NULL,
+booking_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+status ENUM('Pending','Confirmed','Cancelled') DEFAULT 'Pending',
+total_amount DECIMAL(10,2) NOT NULL,
+FOREIGN KEY (flight_id) REFERENCES Flight(flight_id),
+FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
+);
+
+***BOOKINGSEAT***
+CREATE TABLE BookingSeat (
+booking_seat_id INT AUTO_INCREMENT PRIMARY KEY,
+booking_id INT NOT NULL,
+seat_id INT NOT NULL,
+seat_fare DECIMAL(10,2) NOT NULL,
+FOREIGN KEY (booking_id) REFERENCES Booking(booking_id) ON DELETE CASCADE,
+FOREIGN KEY (seat_id) REFERENCES Seat(seat_id),
+UNIQUE (seat_id)
+);
+
+***PAYMENT***
+CREATE TABLE Payment (
+payment_id INT AUTO_INCREMENT PRIMARY KEY,
+booking_id INT NOT NULL,
+amount DECIMAL(10,2) NOT NULL,
+payment_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+method ENUM('Card','UPI','NetBanking','Wallet','Cash') NOT NULL,
+status ENUM('Initiated','Succeeded','Failed','Refunded') DEFAULT 'Initiated',
+FOREIGN KEY (booking_id) REFERENCES Booking(booking_id) ON DELETE CASCADE
+);
+
+
+                                           ###SAMPLE DATA###
+***AIRPORTS***
+INSERT INTO Airport VALUES
+('BLR','Kempegowda International Airport','Bengaluru','India'),
+('DEL','Indira Gandhi International Airport','Delhi','India'),
+('BOM','Chhatrapati Shivaji Maharaj International Airport','Mumbai','India');
+
+***AIRCRAFTS***
+INSERT INTO Aircraft (model,total_seats) VALUES
+('Airbus A320',180),
+('Boeing 737-800',186);
+
+***FLIGHTS***
+INSERT INTO Flight (flight_number,aircraft_id,departure_airport,arrival_airport,departure_time,arrival_time,base_fare,status) VALUES
+('AI560',1,'BLR','DEL','2025-10-25 08:00:00','2025-10-25 10:40:00',5500,'Scheduled'),
+('6E213',2,'BLR','BOM','2025-10-25 09:30:00','2025-10-25 11:05:00',4200,'Scheduled');
+
+***SEATS***
+INSERT INTO Seat (flight_id,seat_number,cabin_class,is_aisle,is_window) VALUES
+(1,'12A','Economy',FALSE,TRUE),
+(1,'12B','Economy',TRUE,FALSE),
+(1,'12C','Economy',TRUE,FALSE),
+(1,'12D','Economy',TRUE,FALSE),
+(2,'14A','Economy',FALSE,TRUE),
+(2,'14B','Economy',TRUE,FALSE);
+
+***CUSTOMERS***
+INSERT INTO Customer (first_name,last_name,email,phone) VALUES
+('Abdul','Khan','abdul.khan@example.com','+91-9000000001'),
+('Neha','Sharma','neha.sharma@example.com','+91-9000000002'),
+('Raj','Verma','raj.verma@example.com','+91-9000000003'),
+('Priya','Menon','priya.menon@example.com','+91-9000000004'),
+('Arjun','Reddy','arjun.reddy@example.com','+91-9000000005'),
+('Kavya','Iyer','kavya.iyer@example.com','+91-9000000006');
+
+
+                                        ###SAMPLE BOOKINGS###
+-- Abdul on AI560 seat 12A
+INSERT INTO Booking (flight_id,customer_id,status,total_amount) VALUES (1,1,'Confirmed',5500);
+INSERT INTO BookingSeat (booking_id,seat_id,seat_fare) VALUES (1,1,2000);
+INSERT INTO Payment (booking_id,amount,method,status) VALUES (1,5500,'UPI','Succeeded');
+
+-- Neha on AI560 seat 12B
+INSERT INTO Booking (flight_id,customer_id,status,total_amount) VALUES (1,2,'Confirmed',5500);
+INSERT INTO BookingSeat (booking_id,seat_id,seat_fare) VALUES (2,2,2000);
+INSERT INTO Payment (booking_id,amount,method,status) VALUES (2,5500,'Card','Succeeded');
+
+-- Raj on 6E213 seat 14A
+INSERT INTO Booking (flight_id,customer_id,status,total_amount) VALUES (2,3,'Confirmed',4200);
+INSERT INTO BookingSeat (booking_id,seat_id,seat_fare) VALUES (3,5,1800);
+INSERT INTO Payment (booking_id,amount,method,status) VALUES (3,4200,'NetBanking','Succeeded');
+
+-- Priya on AI560 seat 12C
+INSERT INTO Booking (flight_id,customer_id,status,total_amount) VALUES (1,4,'Confirmed',5500);
+INSERT INTO BookingSeat (booking_id,seat_id,seat_fare) VALUES (4,3,2000);
+INSERT INTO Payment (booking_id,amount,method,status) VALUES (4,5500,'Wallet','Succeeded');
+
+-- Arjun on AI560 seat 12D
+INSERT INTO Booking (flight_id,customer_id,status,total_amount) VALUES (1,5,'Confirmed',5500);
+INSERT INTO BookingSeat (booking_id,seat_id,seat_fare) VALUES (5,4,2000);
+INSERT INTO Payment (booking_id,amount,method,status) VALUES (5,5500,'Card','Succeeded');
+
+-- Kavya on 6E213 seat 14B
+INSERT INTO Booking (flight_id,customer_id,status,total_amount) VALUES (2,6,'Confirmed',4200);
+INSERT INTO BookingSeat (booking_id,seat_id,seat_fare) VALUES (6,6,1800);
+INSERT INTO Payment (booking_id,amount,method,status) VALUES (6,4200,'UPI','Succeeded');
+
+
+###VIEWS###
+***Flight seat availability***
+CREATE OR REPLACE VIEW v_flight_seat_availability AS
+SELECT f.flight_id,f.flight_number,f.departure_airport,f.arrival_airport,
+       f.departure_time,f.arrival_time,f.status,
+       COUNT(s.seat_id) AS total_seats,
+       COUNT(s.seat_id)-COUNT(bs.seat_id) AS available_seats
+FROM Flight f
+JOIN Seat s ON s.flight_id=f.flight_id
+LEFT JOIN BookingSeat bs ON bs.seat_id=s.seat_id
+GROUP BY f.flight_id;
+
+***Seat-level availability***
+CREATE OR REPLACE VIEW v_seat_availability AS
+SELECT f.flight_number,s.seat_number,s.cabin_class,
+CASE WHEN bs.seat_id IS NULL THEN 'Available' ELSE 'Booked' END AS seat_status
+FROM Flight f
+JOIN Seat s ON s.flight_id=f.flight_id
+LEFT JOIN BookingSeat bs ON bs.seat_id=s.seat_id;
+
+***Upcoming flights***
+CREATE OR REPLACE VIEW v_up
