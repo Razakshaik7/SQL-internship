@@ -1,0 +1,71 @@
+Title: Airline Reservation System using MySQL 
+Tools Used: MySQL Workbench
+Prepared By: Abdul Razak
+
+Introduction:
+The Airline Reservation System is intended to handle flights, customers, bookings, and seat assignments in an organized and effective way. The system maintains data integrity, avoids double-booking of seats, and offers real-time availability status. It also allows for updates, cancellations, and reports for operations information.
+Objectives:
+o	To develop a normalized relational database schema for airline operations.
+o	To handle flights, customers, bookings, seats, and payments.
+o	To enforce business rules through constraints and triggers.
+o	To give queries for flight searches, seats availability, and booking summaries.
+o	To create decision-making and operational monitoring reports.
+
+System Design:
+1 Entity-Relationship (ER) Model:
+Entities:
+o	Airports – Serves to store airport information.
+o	Aircrafts – Serves to store aircraft models and seating capacity.
+o	Flights – Serves to store flight schedules, routes, and prices.
+o	Customers – Serves to store passenger information.
+o	Seats – Serves to store seat maps by flights.
+o	Bookings – Serves to store booking references and statuses.
+o	Booking_Passengers – Serves to store passenger-level seat bookings.
+o	Payments – Serves to store payment transactions.
+
+Relationships:
+o	One aircraft → many flights.
+o	One flight → many seats.
+o	One customer → many bookings.
+o	One booking → many passengers.
+o	One booking → many payments.
+
+2 Normalization:
+1NF: Each table has atomic values (seat_number, passenger_name).
+2NF: Non-key attributes rely solely on primary keys (fare relies on booking_passenger, not booking_id exclusively).
+3NF: No transitive dependencies (airport information stored independently, not within flights).
+
+Implementation:
+1 Schema Creation:
+Tables with primary keys, foreign keys, unique constraints, and check constraints are created.
+Indexes added for quicker queries on flight routes, times, and booking statuses.
+
+2 Sample Data:
+o	Inserted airports (BLR, BOM, DEL).
+o	Inserted aircrafts (Airbus A320, Boeing 737).
+o	Inserted flights (BLR–BOM, BOM–BLR, BLR–DEL).
+o	Inserted customers and bookings with assigned seats.
+
+3 Triggers:
+o	AUTO-update booking totals when passengers are added/removed.
+o	AUTO-cancel bookings when all passengers are cancelled.
+o	Prevent blocked seat assignment using a trigger.
+o	Release seats when passengers are cancelled.
+
+4 Views and Queries:
+o	flight_availability: Displays available seats per flight.
+o	v_available_seats_detailed: Displays available seats per cabin class.
+o	Flight search query: Browsers flights by route, date, and seat availability.
+o	Seat availability query: Displays unbored seats for a flight.
+
+Result:
+1.Flight Availability Example:
+FlightNo	   Route	     Departure	  Arrival    AvailableSeats
+AI512	      BLR-BOM	      8:30	       10:30	        177
+
+2 Booking Summary Report:
+FlightNo	   Date	     TotalBookings	Confirmed	   Passengers	   Revenue(₹)	  Seats Sold
+AI512	    2025-11-15	      2	            1	           3	         9600	          3
+
+Conclusion:
+Airline Reservation System effectively proves that relational databases can handle complicated airline operations. With normalization, constraints, triggers, and reporting, the system protects data integrity, avoids mistakes, and offers valuable insights. It can easily expand to an elaborate production system with added functions such as dynamic pricing, refund processing, and web integration.
